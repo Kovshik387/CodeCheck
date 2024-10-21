@@ -1,0 +1,25 @@
+name: Check's Repositories
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  
+  workflow_dispatch:
+
+jobs:
+  check-labs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: [
+
+        ]
+
+    steps:
+    - name: Checkout code for evaluation
+      run: |
+        git clone https://github.com/${{ matrix.repo }} student-code
+        cd student-code
+        
+        gcc -o lab_program main.c || exit 1
+        
+        ./lab_program
