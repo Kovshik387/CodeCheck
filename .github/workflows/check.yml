@@ -8,18 +8,23 @@ on:
 jobs:
   check-labs:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repo: [
-
-        ]
 
     steps:
-    - name: Checkout code for evaluation
+    - name: Checkout script repository
+      uses: actions/checkout@v2
+
+    - name: Read students' repositories
+      id: read_repos
       run: |
-        git clone https://github.com/${{ matrix.repo }} student-code
-        cd student-code
-        
-        gcc -o lab_program main.c || exit 1
-        
-        ./lab_program
+        repos=$(cat students.txt)
+        echo "::set-output name=repos::$repos"
+
+    - name: Clone and check each repo
+      run: |
+        for repo in ${{ steps.read_repos.outputs.repos }}; do
+          git clone https://github.com/$repo student-code || exit 1
+          cd student-code
+          gcc -o lab_program main.c || exit 1
+          ./lab_program || exit 1
+          cd ..
+        done
